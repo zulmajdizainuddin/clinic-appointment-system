@@ -26,56 +26,131 @@ export default function AdminUsers() {
   }, []);
 
   return (
-    <div style={{ padding: 40, maxWidth: 950, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div
+      style={{
+        padding: "40px 20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        minHeight: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "32px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
         <div>
-          <h2 style={{ margin: 0 }}>Admin - Users</h2>
-          <p style={{ opacity: 0.8, marginTop: 6 }}>
-            View all users in the system.
+          <h2 style={{ margin: "0 0 8px 0", color: "#ffffff" }}>
+            Admin - Users
+          </h2>
+          <p style={{ color: "rgba(255, 255, 255, 0.7)", margin: 0 }}>
+            View all users in the system
           </p>
         </div>
-        <button onClick={logout} style={{ height: 40 }}>
+        <button className="btn" onClick={logout}>
           Logout
         </button>
       </div>
 
-      {/* Simple nav */}
-      <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "24px",
+          flexWrap: "wrap",
+        }}
+      >
         <Link to="/admin">
-          <button>Appointments</button>
+          <button className="btn">Appointments</button>
         </Link>
         <Link to="/admin/users">
-          <button>Users</button>
+          <button className="btn">Users</button>
         </Link>
-        <button onClick={fetchUsers}>Refresh</button>
+        <button className="btn" onClick={fetchUsers}>
+          Refresh
+        </button>
       </div>
 
-      {error && <p style={{ color: "salmon", marginTop: 12 }}>{error}</p>}
-      {loading && <p style={{ marginTop: 18 }}>Loading...</p>}
+      {error && (
+        <div className="error-message" style={{ marginBottom: "24px" }}>
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="loading">Loading users...</div>
+      )}
 
-      {!loading && users.length === 0 && <p style={{ marginTop: 18 }}>No users found.</p>}
+      {!loading && users.length === 0 && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "60px 20px",
+            color: "rgba(255, 255, 255, 0.6)",
+          }}
+        >
+          No users found.
+        </div>
+      )}
 
       {!loading && users.length > 0 && (
-        <div style={{ marginTop: 18 }}>
+        <div
+          style={{
+            marginTop: "24px",
+            background: "rgba(30, 41, 59, 0.4)",
+            borderRadius: "12px",
+            overflow: "hidden",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+          }}
+        >
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                <th style={{ textAlign: "left", borderBottom: "1px solid #444", padding: 10 }}>ID</th>
-                <th style={{ textAlign: "left", borderBottom: "1px solid #444", padding: 10 }}>Name</th>
-                <th style={{ textAlign: "left", borderBottom: "1px solid #444", padding: 10 }}>Email</th>
-                <th style={{ textAlign: "left", borderBottom: "1px solid #444", padding: 10 }}>Role</th>
-                <th style={{ textAlign: "left", borderBottom: "1px solid #444", padding: 10 }}>Created</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
                 <tr key={u.id}>
-                  <td style={{ borderBottom: "1px solid #333", padding: 10 }}>{u.id}</td>
-                  <td style={{ borderBottom: "1px solid #333", padding: 10 }}>{u.name}</td>
-                  <td style={{ borderBottom: "1px solid #333", padding: 10 }}>{u.email}</td>
-                  <td style={{ borderBottom: "1px solid #333", padding: 10 }}>{u.role}</td>
-                  <td style={{ borderBottom: "1px solid #333", padding: 10 }}>
-                    {u.created_at ? new Date(u.created_at).toLocaleString() : "-"}
+                  <td>{u.id}</td>
+                  <td>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td>
+                    <span
+                      style={{
+                        padding: "4px 12px",
+                        borderRadius: "12px",
+                        fontSize: "0.85rem",
+                        fontWeight: "600",
+                        background:
+                          u.role === "admin"
+                            ? "rgba(212, 175, 55, 0.2)"
+                            : u.role === "doctor"
+                            ? "rgba(59, 130, 246, 0.2)"
+                            : "rgba(107, 114, 128, 0.2)",
+                        color:
+                          u.role === "admin"
+                            ? "#d4af37"
+                            : u.role === "doctor"
+                            ? "#60a5fa"
+                            : "#9ca3af",
+                      }}
+                    >
+                      {u.role}
+                    </span>
+                  </td>
+                  <td>
+                    {u.created_at
+                      ? new Date(u.created_at).toLocaleString()
+                      : "-"}
                   </td>
                 </tr>
               ))}

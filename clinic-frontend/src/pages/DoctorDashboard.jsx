@@ -3,21 +3,10 @@ import api from "../api/axios";
 import { logout } from "../utils/logout";
 
 function StatusBadge({ status }) {
-  const style = {
-    display: "inline-block",
-    padding: "4px 10px",
-    borderRadius: 999,
-    fontSize: 12,
-    border: "1px solid #444",
-    marginLeft: 8,
-  };
-
-  let label = status || "unknown";
-  if (label === "pending") style.background = "#2b2b2b";
-  if (label === "approved") style.background = "#123b1f";
-  if (label === "rejected") style.background = "#3b1212";
-
-  return <span style={style}>{label.toUpperCase()}</span>;
+  const label = status || "unknown";
+  const badgeClass = label === "pending" ? "pending" : label === "approved" ? "approved" : "rejected";
+  
+  return <span className={`badge ${badgeClass}`} style={{ marginLeft: 8 }}>{label.toUpperCase()}</span>;
 }
 
 export default function DoctorDashboard() {
@@ -63,73 +52,125 @@ export default function DoctorDashboard() {
   }, []);
 
   return (
-    <div style={{ padding: 40, maxWidth: 900, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div
+      style={{
+        padding: "40px 20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        minHeight: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "32px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
         <div>
-          <h2 style={{ margin: 0 }}>Doctor Dashboard</h2>
-          <p style={{ opacity: 0.8, marginTop: 6 }}>
-            View and approve/reject student appointments.
+          <h2 style={{ margin: "0 0 8px 0", color: "#ffffff" }}>
+            Doctor Dashboard
+          </h2>
+          <p style={{ color: "rgba(255, 255, 255, 0.7)", margin: 0 }}>
+            View and approve/reject student appointments
           </p>
         </div>
-        <button onClick={logout} style={{ height: 40 }}>
+        <button className="btn" onClick={logout}>
           Logout
         </button>
       </div>
 
-      <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-        <button onClick={fetchAppointments}>Refresh</button>
+      <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
+        <button className="btn" onClick={fetchAppointments}>
+          Refresh
+        </button>
       </div>
 
       {error && (
-        <p style={{ color: "salmon", marginTop: 12 }}>
+        <div className="error-message" style={{ marginBottom: "24px" }}>
           {error}
-        </p>
+        </div>
       )}
 
-      {loading && <p style={{ marginTop: 18 }}>Loading...</p>}
+      {loading && (
+        <div className="loading">Loading appointments...</div>
+      )}
 
       {!loading && appointments.length === 0 && (
-        <p style={{ marginTop: 18 }}>No appointments yet.</p>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "60px 20px",
+            color: "rgba(255, 255, 255, 0.6)",
+          }}
+        >
+          No appointments yet.
+        </div>
       )}
 
       {!loading && appointments.length > 0 && (
-        <div style={{ marginTop: 18 }}>
+        <div style={{ marginTop: "24px" }}>
           {appointments.map((a) => {
             const isUpdating = updatingId === a.id;
             const canDecide = a.status === "pending";
 
             return (
-              <div
-                key={a.id}
-                style={{
-                  border: "1px solid #444",
-                  padding: 16,
-                  marginBottom: 12,
-                  borderRadius: 12,
-                  background: "#1b1b1b",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div key={a.id} className="card">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "16px",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                  }}
+                >
                   <div>
-                    <b>Appointment #{a.id}</b>
-                    <StatusBadge status={a.status} />
+                    <h3 style={{ margin: "0 0 8px 0", color: "#d4af37" }}>
+                      Appointment #{a.id}
+                    </h3>
+                    <p style={{ margin: 0, color: "rgba(255, 255, 255, 0.7)" }}>
+                      {a.appointment_date} • {a.appointment_time}
+                    </p>
                   </div>
-                  <div style={{ opacity: 0.8 }}>
-                    {a.appointment_date} • {a.appointment_time}
-                  </div>
+                  <StatusBadge status={a.status} />
                 </div>
 
-                <div style={{ marginTop: 12 }}>
-                  <p style={{ margin: "6px 0" }}>
-                    <b>Student:</b> {a.student?.name} ({a.student?.email})
+                <div
+                  style={{
+                    display: "grid",
+                    gap: "12px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <p style={{ margin: 0 }}>
+                    <b style={{ color: "#d4af37" }}>Student:</b>{" "}
+                    <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                      {a.student?.name} ({a.student?.email})
+                    </span>
                   </p>
-                  <p style={{ margin: "6px 0" }}>
-                    <b>Reason:</b> {a.reason || "-"}
+                  <p style={{ margin: 0 }}>
+                    <b style={{ color: "#d4af37" }}>Reason:</b>{" "}
+                    <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                      {a.reason || "-"}
+                    </span>
                   </p>
                 </div>
 
-                <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <button
+                    className="btn-approve"
                     disabled={!canDecide || isUpdating}
                     onClick={() => updateStatus(a.id, "approved")}
                   >
@@ -137,6 +178,7 @@ export default function DoctorDashboard() {
                   </button>
 
                   <button
+                    className="btn-reject"
                     disabled={!canDecide || isUpdating}
                     onClick={() => updateStatus(a.id, "rejected")}
                   >
@@ -144,7 +186,12 @@ export default function DoctorDashboard() {
                   </button>
 
                   {!canDecide && (
-                    <span style={{ opacity: 0.7, alignSelf: "center" }}>
+                    <span
+                      style={{
+                        color: "rgba(255, 255, 255, 0.6)",
+                        alignSelf: "center",
+                      }}
+                    >
                       Already decided
                     </span>
                   )}

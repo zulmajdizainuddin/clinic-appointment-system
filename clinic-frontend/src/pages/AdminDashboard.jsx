@@ -80,12 +80,30 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div style={{ padding: 40, maxWidth: 950, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div
+      style={{
+        padding: "40px 20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        minHeight: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "32px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
         <div>
-          <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
-          <p style={{ opacity: 0.8, marginTop: 6 }}>
-            View all appointments in the system.
+          <h2 style={{ margin: "0 0 8px 0", color: "#ffffff" }}>
+            Admin Dashboard
+          </h2>
+          <p style={{ color: "rgba(255, 255, 255, 0.7)", margin: 0 }}>
+            View all appointments in the system
           </p>
         </div>
 
@@ -94,47 +112,84 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "24px",
+          flexWrap: "wrap",
+        }}
+      >
         <Link to="/admin">
           <button className="btn">Appointments</button>
         </Link>
         <Link to="/admin/users">
           <button className="btn">Users</button>
         </Link>
-
         <button className="btn" onClick={fetchAllAppointments}>
           Refresh
         </button>
       </div>
 
-      {error && <p style={{ color: "salmon" }}>{error}</p>}
-      {loading && <p>Loading...</p>}
+      {error && (
+        <div className="error-message" style={{ marginBottom: "24px" }}>
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="loading">Loading appointments...</div>
+      )}
 
-      {!loading && appointments.length === 0 && <p>No appointments found.</p>}
+      {!loading && appointments.length === 0 && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "60px 20px",
+            color: "rgba(255, 255, 255, 0.6)",
+          }}
+        >
+          No appointments found.
+        </div>
+      )}
 
       {!loading && appointments.length > 0 && (
-        <div style={{ marginTop: 18 }}>
+        <div style={{ marginTop: "24px" }}>
           {appointments.map((a) => (
             <div key={a.id} className="card">
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <b>Appointment #{a.id}</b>
-                <span style={{ opacity: 0.8 }}>
-                  {a.appointment_date} • {a.appointment_time}
-                </span>
-              </div>
-
-              {/* ✅ Status badge */}
-              <p style={{ margin: "8px 0" }}>
-                <b>Status:</b>{" "}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "16px",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                }}
+              >
+                <div>
+                  <h3 style={{ margin: "0 0 8px 0", color: "#d4af37" }}>
+                    Appointment #{a.id}
+                  </h3>
+                  <p style={{ margin: 0, color: "rgba(255, 255, 255, 0.7)" }}>
+                    {a.appointment_date} • {a.appointment_time}
+                  </p>
+                </div>
                 <span className={`badge ${a.status}`}>
                   {String(a.status || "").toUpperCase()}
                 </span>
-              </p>
+              </div>
 
-              {/* ✅ NEW: Approve / Reject / Reset */}
-              <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  marginBottom: "20px",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                }}
+              >
                 <button
-                  className="btn"
+                  className="btn-approve"
                   onClick={() => updateStatus(a.id, "approved")}
                   disabled={updatingStatusId === a.id}
                 >
@@ -142,7 +197,7 @@ export default function AdminDashboard() {
                 </button>
 
                 <button
-                  className="btn"
+                  className="btn-reject"
                   onClick={() => updateStatus(a.id, "rejected")}
                   disabled={updatingStatusId === a.id}
                 >
@@ -150,7 +205,7 @@ export default function AdminDashboard() {
                 </button>
 
                 <button
-                  className="btn"
+                  className="btn-ghost"
                   onClick={() => updateStatus(a.id, "pending")}
                   disabled={updatingStatusId === a.id}
                 >
@@ -158,34 +213,56 @@ export default function AdminDashboard() {
                 </button>
 
                 {updatingStatusId === a.id && (
-                  <span style={{ opacity: 0.8 }}>Updating...</span>
+                  <span style={{ color: "rgba(255, 255, 255, 0.6)" }}>
+                    Updating...
+                  </span>
                 )}
               </div>
 
-              <p style={{ margin: "6px 0" }}>
-                <b>Student:</b> {a.student?.name} ({a.student?.email})
-              </p>
-
-              <p style={{ margin: "6px 0" }}>
-                <b>Doctor:</b>{" "}
-                {a.doctor
-                  ? `${a.doctor.name} (${a.doctor.email})`
-                  : "Not assigned"}
-              </p>
-
-              {/* ✅ Assign doctor dropdown */}
               <div
                 style={{
-                  marginTop: 10,
+                  display: "grid",
+                  gap: "12px",
+                  marginBottom: "20px",
+                }}
+              >
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Student:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.student?.name} ({a.student?.email})
+                  </span>
+                </p>
+
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Doctor:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.doctor
+                      ? `${a.doctor.name} (${a.doctor.email})`
+                      : "Not assigned"}
+                  </span>
+                </p>
+
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Reason:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.reason || "-"}
+                  </span>
+                </p>
+              </div>
+
+              <div
+                style={{
                   display: "flex",
-                  gap: 10,
+                  gap: "12px",
                   alignItems: "center",
+                  flexWrap: "wrap",
                 }}
               >
                 <select
                   value={a.doctor?.id || ""}
                   onChange={(e) => assignDoctor(a.id, e.target.value)}
                   disabled={assigningId === a.id}
+                  style={{ flex: "1", minWidth: "200px" }}
                 >
                   <option value="">-- Assign doctor --</option>
                   {doctors.map((d) => (
@@ -195,12 +272,12 @@ export default function AdminDashboard() {
                   ))}
                 </select>
 
-                {assigningId === a.id && <span>Assigning...</span>}
+                {assigningId === a.id && (
+                  <span style={{ color: "rgba(255, 255, 255, 0.6)" }}>
+                    Assigning...
+                  </span>
+                )}
               </div>
-
-              <p style={{ margin: "6px 0" }}>
-                <b>Reason:</b> {a.reason || "-"}
-              </p>
             </div>
           ))}
         </div>

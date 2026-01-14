@@ -72,100 +72,182 @@ export default function StudentDashboard() {
   }, []);
 
   return (
-    <div style={{ padding: 40 }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>Student Dashboard</h2>
-        <button onClick={logout}>Logout</button>
+    <div
+      style={{
+        padding: "40px 20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        minHeight: "100vh",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "40px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
+        <h2 style={{ margin: 0, color: "#ffffff" }}>Student Dashboard</h2>
+        <button className="btn" onClick={logout}>
+          Logout
+        </button>
       </div>
 
-      <h3 style={{ marginTop: 25 }}>Book Appointment</h3>
+      <div className="card" style={{ marginBottom: "40px" }}>
+        <h3 style={{ margin: "0 0 24px 0", color: "#d4af37" }}>
+          Book Appointment
+        </h3>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && (
+          <div className="error-message" style={{ marginBottom: "24px" }}>
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={bookAppointment} style={{ marginTop: 10 }}>
-        <div style={{ marginBottom: 10 }}>
-          <label>Doctor: </label>
-          <select
-            value={doctorId}
-            onChange={(e) => setDoctorId(e.target.value)}
-            style={{ marginLeft: 10 }}
-          >
-            {doctors.length === 0 ? (
-              <option value="">No doctors found</option>
-            ) : (
-              doctors.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.email})
-                </option>
-              ))
-            )}
-          </select>
-        </div>
+        <form onSubmit={bookAppointment}>
+          <div style={{ marginBottom: "20px" }}>
+            <label htmlFor="doctor">Doctor</label>
+            <select
+              id="doctor"
+              value={doctorId}
+              onChange={(e) => setDoctorId(e.target.value)}
+            >
+              {doctors.length === 0 ? (
+                <option value="">No doctors found</option>
+              ) : (
+                doctors.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name} ({d.email})
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
 
-        <div style={{ marginBottom: 10 }}>
-          <label>Date: </label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={{ marginLeft: 10 }}
-          />
-        </div>
+          <div style={{ marginBottom: "20px" }}>
+            <label htmlFor="date">Date</label>
+            <input
+              id="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
 
-        <div style={{ marginBottom: 10 }}>
-          <label>Time: </label>
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            style={{ marginLeft: 10 }}
-          />
-        </div>
+          <div style={{ marginBottom: "20px" }}>
+            <label htmlFor="time">Time</label>
+            <input
+              id="time"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
+          </div>
 
-        <div style={{ marginBottom: 10 }}>
-          <label>Reason: </label>
-          <input
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="e.g. headache"
-            style={{ marginLeft: 10, width: 250 }}
-          />
-        </div>
+          <div style={{ marginBottom: "24px" }}>
+            <label htmlFor="reason">Reason</label>
+            <input
+              id="reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="e.g. headache, consultation"
+            />
+          </div>
 
-        <button type="submit">Book (Pending)</button>
-      </form>
-
-      <hr style={{ margin: "30px 0" }} />
-
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h3>My Appointments</h3>
-        <button onClick={fetchMine}>Refresh</button>
+          <button type="submit" style={{ width: "100%" }}>
+            Book Appointment
+          </button>
+        </form>
       </div>
 
-      {loading && <p>Loading...</p>}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+          flexWrap: "wrap",
+          gap: "12px",
+        }}
+      >
+        <h3 style={{ margin: 0, color: "#ffffff" }}>My Appointments</h3>
+        <button className="btn" onClick={fetchMine}>
+          Refresh
+        </button>
+      </div>
 
-      {!loading && appointments.length === 0 && <p>No appointments yet.</p>}
+      {loading && (
+        <div className="loading">Loading appointments...</div>
+      )}
+
+      {!loading && appointments.length === 0 && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "60px 20px",
+            color: "rgba(255, 255, 255, 0.6)",
+          }}
+        >
+          No appointments yet.
+        </div>
+      )}
 
       {!loading && appointments.length > 0 && (
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: "24px" }}>
           {appointments.map((a) => (
-            <div
-              key={a.id}
-              style={{
-                border: "1px solid #444",
-                padding: 12,
-                marginBottom: 10,
-                borderRadius: 8,
-              }}
-            >
-              <p><b>ID:</b> {a.id}</p>
-              <p>
-                <b>Doctor:</b> {a.doctor?.name} ({a.doctor?.email})
-              </p>
-              <p><b>Date:</b> {a.appointment_date}</p>
-              <p><b>Time:</b> {a.appointment_time}</p>
-              <p><b>Reason:</b> {a.reason}</p>
-              <p><b>Status:</b> {a.status}</p>
+            <div key={a.id} className="card">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "16px",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                }}
+              >
+                <h3 style={{ margin: 0, color: "#d4af37" }}>
+                  Appointment #{a.id}
+                </h3>
+                <span className={`badge ${a.status}`}>
+                  {String(a.status || "").toUpperCase()}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "12px",
+                }}
+              >
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Doctor:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.doctor?.name} ({a.doctor?.email})
+                  </span>
+                </p>
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Date:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.appointment_date}
+                  </span>
+                </p>
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Time:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.appointment_time}
+                  </span>
+                </p>
+                <p style={{ margin: 0 }}>
+                  <b style={{ color: "#d4af37" }}>Reason:</b>{" "}
+                  <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
+                    {a.reason || "-"}
+                  </span>
+                </p>
+              </div>
             </div>
           ))}
         </div>
