@@ -149,11 +149,12 @@ export default function StudentDashboard() {
 
           <div style={{ marginBottom: "24px" }}>
             <label htmlFor="reason">Reason</label>
-            <input
+            <textarea
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. headache, consultation"
+              rows={3}
             />
           </div>
 
