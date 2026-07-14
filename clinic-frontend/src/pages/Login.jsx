@@ -8,10 +8,13 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (submitting) return;
     setError("");
+    setSubmitting(true);
 
     try {
       const res = await api.post("/login", { email, password });
@@ -25,6 +28,7 @@ export default function Login() {
       else navigate("/student");
     } catch (err) {
       setError(err?.response?.data?.message || "Login failed");
+      setSubmitting(false);
     }
   };
 
@@ -99,6 +103,7 @@ export default function Login() {
 
           <button
             type="submit"
+            disabled={submitting}
             style={{
               width: "100%",
               padding: "14px",
@@ -106,7 +111,7 @@ export default function Login() {
               fontWeight: "600",
             }}
           >
-            Sign In
+            {submitting ? "Signing In..." : "Sign In"}
           </button>
         </form>
       </div>

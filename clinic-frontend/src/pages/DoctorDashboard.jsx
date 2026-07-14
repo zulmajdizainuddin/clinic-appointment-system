@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
 import StatusBadge from "../components/StatusBadge";
@@ -8,6 +8,7 @@ export default function DoctorDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+  const updatingRef = useRef(new Set());
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -24,6 +25,8 @@ export default function DoctorDashboard() {
   };
 
   const updateStatus = async (id, status) => {
+    if (updatingRef.current.has(id)) return;
+    updatingRef.current.add(id);
     setUpdatingId(id);
     setError("");
     try {
@@ -37,6 +40,7 @@ export default function DoctorDashboard() {
         err?.response?.data?.message || "Failed to update appointment status.";
       setError(msg);
     } finally {
+      updatingRef.current.delete(id);
       setUpdatingId(null);
     }
   };

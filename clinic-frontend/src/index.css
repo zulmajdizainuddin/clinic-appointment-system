@@ -95,6 +95,7 @@ button:disabled {
   transform: none;
 }
 
+button:focus,
 button:focus-visible {
   outline: 2px solid var(--gold-primary);
   outline-offset: 2px;

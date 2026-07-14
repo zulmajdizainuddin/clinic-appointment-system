@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
 import { Link } from "react-router-dom";
@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const [doctors, setDoctors] = useState([]);
   const [assigningId, setAssigningId] = useState(null);
   const [updatingStatusId, setUpdatingStatusId] = useState(null);
+  const updatingRef = useRef(new Set());
 
   const fetchAllAppointments = async () => {
     setLoading(true);
@@ -32,7 +33,7 @@ export default function AdminDashboard() {
       const res = await api.get("/doctors");
       setDoctors(res.data);
     } catch (err) {
-      console.error("Failed to load doctors");
+      setError(err?.response?.data?.message || "Failed to load doctors list.");
     }
   };
 
@@ -58,6 +59,8 @@ export default function AdminDashboard() {
 
   // ✅ NEW: Admin update appointment status
   const updateStatus = async (appointmentId, status) => {
+    if (updatingRef.current.has(appointmentId)) return;
+    updatingRef.current.add(appointmentId);
     setUpdatingStatusId(appointmentId);
     try {
       const res = await api.put(`/admin/appointments/${appointmentId}/status`, {
@@ -71,6 +74,7 @@ export default function AdminDashboard() {
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to update status");
     } finally {
+      updatingRef.current.delete(appointmentId);
       setUpdatingStatusId(null);
     }
   };
