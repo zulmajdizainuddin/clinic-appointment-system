@@ -259,11 +259,19 @@ export default function AdminDashboard() {
               >
                 <select
                   value={a.doctor?.id || ""}
-                  onChange={(e) => assignDoctor(a.id, e.target.value)}
+                  onChange={(e) => {
+                    if (!e.target.value) return;
+                    assignDoctor(a.id, e.target.value);
+                  }}
                   disabled={assigningId === a.id}
                   style={{ flex: "1", minWidth: "200px" }}
                 >
                   <option value="">-- Assign doctor --</option>
+                  {a.doctor && !doctors.some((d) => d.id === a.doctor.id) && (
+                    <option value={a.doctor.id}>
+                      {a.doctor.name} ({a.doctor.email})
+                    </option>
+                  )}
                   {doctors.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name} ({d.email})
