@@ -1,19 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
-
-function StatusBadge({ status }) {
-  const label = status || "unknown";
-  const badgeClass = label === "pending" ? "pending" : label === "approved" ? "approved" : "rejected";
-  
-  return <span className={`badge ${badgeClass}`} style={{ marginLeft: 8 }}>{label.toUpperCase()}</span>;
-}
+import StatusBadge from "../components/StatusBadge";
 
 export default function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+  const updatingRef = useRef(new Set());
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -30,6 +25,8 @@ export default function DoctorDashboard() {
   };
 
   const updateStatus = async (id, status) => {
+    if (updatingRef.current.has(id)) return;
+    updatingRef.current.add(id);
     setUpdatingId(id);
     setError("");
     try {
@@ -43,6 +40,7 @@ export default function DoctorDashboard() {
         err?.response?.data?.message || "Failed to update appointment status.";
       setError(msg);
     } finally {
+      updatingRef.current.delete(id);
       setUpdatingId(null);
     }
   };

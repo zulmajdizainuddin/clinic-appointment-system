@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
 import { Link } from "react-router-dom";
+import StatusBadge from "../components/StatusBadge";
 
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -10,6 +11,7 @@ export default function AdminDashboard() {
   const [doctors, setDoctors] = useState([]);
   const [assigningId, setAssigningId] = useState(null);
   const [updatingStatusId, setUpdatingStatusId] = useState(null);
+  const updatingRef = useRef(new Set());
 
   const fetchAllAppointments = async () => {
     setLoading(true);
@@ -31,7 +33,7 @@ export default function AdminDashboard() {
       const res = await api.get("/doctors");
       setDoctors(res.data);
     } catch (err) {
-      console.error("Failed to load doctors");
+      setError(err?.response?.data?.message || "Failed to load doctors list.");
     }
   };
 
@@ -57,6 +59,8 @@ export default function AdminDashboard() {
 
   // ✅ NEW: Admin update appointment status
   const updateStatus = async (appointmentId, status) => {
+    if (updatingRef.current.has(appointmentId)) return;
+    updatingRef.current.add(appointmentId);
     setUpdatingStatusId(appointmentId);
     try {
       const res = await api.put(`/admin/appointments/${appointmentId}/status`, {
@@ -70,6 +74,7 @@ export default function AdminDashboard() {
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to update status");
     } finally {
+      updatingRef.current.delete(appointmentId);
       setUpdatingStatusId(null);
     }
   };
@@ -174,9 +179,7 @@ export default function AdminDashboard() {
                     {a.appointment_date} • {a.appointment_time}
                   </p>
                 </div>
-                <span className={`badge ${a.status}`}>
-                  {String(a.status || "").toUpperCase()}
-                </span>
+                <StatusBadge status={a.status} />
               </div>
 
               <div
@@ -260,11 +263,19 @@ export default function AdminDashboard() {
               >
                 <select
                   value={a.doctor?.id || ""}
-                  onChange={(e) => assignDoctor(a.id, e.target.value)}
+                  onChange={(e) => {
+                    if (!e.target.value) return;
+                    assignDoctor(a.id, e.target.value);
+                  }}
                   disabled={assigningId === a.id}
                   style={{ flex: "1", minWidth: "200px" }}
                 >
                   <option value="">-- Assign doctor --</option>
+                  {a.doctor && !doctors.some((d) => d.id === a.doctor.id) && (
+                    <option value={a.doctor.id}>
+                      {a.doctor.name} ({a.doctor.email})
+                    </option>
+                  )}
                   {doctors.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name} ({d.email})

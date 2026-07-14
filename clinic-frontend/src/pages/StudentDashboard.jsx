@@ -1,28 +1,31 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
+import StatusBadge from "../components/StatusBadge";
 
 export default function StudentDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [appointmentsError, setAppointmentsError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   // booking form states
-  const [doctorId, setDoctorId] = useState(2); // default doctor id (yours is 2)
-  const [date, setDate] = useState("2026-01-10");
-  const [time, setTime] = useState("10:30");
+  const [doctorId, setDoctorId] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
 
   const fetchMine = async () => {
     setLoading(true);
-    setError("");
+    setAppointmentsError("");
     try {
       const res = await api.get("/appointments/mine");
       const data = Array.isArray(res.data) ? res.data : [res.data];
       setAppointments(data);
     } catch (err) {
-      setError("Failed to load your appointments.");
+      setAppointmentsError("Failed to load your appointments.");
     } finally {
       setLoading(false);
     }
@@ -31,9 +34,10 @@ export default function StudentDashboard() {
   const fetchDoctors = async () => {
     try {
       const res = await api.get("/doctors");
-      setDoctors(res.data);
+      const list = Array.isArray(res.data) ? res.data : [];
+      setDoctors(list);
       // Auto select first doctor if none selected
-      if (res.data.length > 0) setDoctorId(res.data[0].id);
+      if (list.length > 0) setDoctorId(list[0].id);
     } catch (err) {
       setError("Failed to load doctors list.");
     }
@@ -46,6 +50,7 @@ export default function StudentDashboard() {
   const bookAppointment = async (e) => {
     e.preventDefault();
     setError("");
+    setSubmitting(true);
 
     try {
       await api.post("/appointments", {
@@ -64,12 +69,10 @@ export default function StudentDashboard() {
         err?.response?.data?.message ||
         "Failed to book appointment. Check doctor_id/date/time.";
       setError(msg);
+    } finally {
+      setSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    fetchMine();
-  }, []);
 
   return (
     <div
@@ -158,8 +161,8 @@ export default function StudentDashboard() {
             />
           </div>
 
-          <button type="submit" style={{ width: "100%" }}>
-            Book Appointment
+          <button type="submit" style={{ width: "100%" }} disabled={submitting}>
+            {submitting ? "Booking..." : "Book Appointment"}
           </button>
         </form>
       </div>
@@ -179,6 +182,12 @@ export default function StudentDashboard() {
           Refresh
         </button>
       </div>
+
+      {appointmentsError && (
+        <div className="error-message" style={{ marginBottom: "24px" }}>
+          {appointmentsError}
+        </div>
+      )}
 
       {loading && (
         <div className="loading">Loading appointments...</div>
@@ -213,9 +222,7 @@ export default function StudentDashboard() {
                 <h3 style={{ margin: 0, color: "#d4af37" }}>
                   Appointment #{a.id}
                 </h3>
-                <span className={`badge ${a.status}`}>
-                  {String(a.status || "").toUpperCase()}
-                </span>
+                <StatusBadge status={a.status} />
               </div>
 
               <div
