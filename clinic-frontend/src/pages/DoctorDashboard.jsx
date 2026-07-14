@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
-
-function StatusBadge({ status }) {
-  const label = status || "unknown";
-  const badgeClass = label === "pending" ? "pending" : label === "approved" ? "approved" : "rejected";
-  
-  return <span className={`badge ${badgeClass}`} style={{ marginLeft: 8 }}>{label.toUpperCase()}</span>;
-}
+import StatusBadge from "../components/StatusBadge";
 
 export default function DoctorDashboard() {
   const [appointments, setAppointments] = useState([]);

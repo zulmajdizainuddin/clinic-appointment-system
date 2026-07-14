@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
 import { Link } from "react-router-dom";
+import StatusBadge from "../components/StatusBadge";
 
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -174,9 +175,7 @@ export default function AdminDashboard() {
                     {a.appointment_date} • {a.appointment_time}
                   </p>
                 </div>
-                <span className={`badge ${a.status}`}>
-                  {String(a.status || "").toUpperCase()}
-                </span>
+                <StatusBadge status={a.status} />
               </div>
 
               <div

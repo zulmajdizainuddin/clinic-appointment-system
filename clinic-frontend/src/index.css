@@ -214,6 +214,12 @@ button:focus-visible {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+.badge.completed {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
 /* Form Elements */
 input[type="text"],
 input[type="email"],

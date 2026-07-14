@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { logout } from "../utils/logout";
+import StatusBadge from "../components/StatusBadge";
 
 export default function StudentDashboard() {
   const [appointments, setAppointments] = useState([]);
@@ -213,9 +214,7 @@ export default function StudentDashboard() {
                 <h3 style={{ margin: 0, color: "#d4af37" }}>
                   Appointment #{a.id}
                 </h3>
-                <span className={`badge ${a.status}`}>
-                  {String(a.status || "").toUpperCase()}
-                </span>
+                <StatusBadge status={a.status} />
               </div>
 
               <div
